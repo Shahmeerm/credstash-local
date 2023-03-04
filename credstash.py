@@ -239,7 +239,7 @@ def getHighestVersion(name, region=None, table="credential-store",
     '''
     session = get_session(**kwargs)
 
-    dynamodb = session.resource('dynamodb', region_name=region)
+    dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
     secrets = dynamodb.Table(table)
 
     response = secrets.query(Limit=1,
@@ -293,7 +293,7 @@ def listSecrets(region=None, table="credential-store", session=None, **kwargs):
     if session is None:
         session = get_session(**kwargs)
 
-    dynamodb = session.resource('dynamodb', region_name=region)
+    dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
     secrets = dynamodb.Table(table)
 
     items = []
@@ -328,7 +328,7 @@ def putSecret(name, secret, version="", kms_key="alias/credstash",
     if dynamodb is None or kms is None:
         session = get_session(**kwargs)
         if dynamodb is None:
-            dynamodb = session.resource('dynamodb', region_name=region)
+            dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
         if kms is None:
             kms = session.client('kms', region_name=kms_region or region)
 
@@ -379,7 +379,7 @@ def getAllSecrets(version="", region=None, table="credential-store",
     '''
     if session is None:
         session = get_session(**kwargs)
-    dynamodb = session.resource('dynamodb', region_name=region)
+    dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
     kms = session.client('kms', region_name=kms_region or region)
     secrets = listSecrets(region, table, session, **kwargs)
 
@@ -561,7 +561,7 @@ def getSecret(name, version="", region=None, table="credential-store", context=N
     if dynamodb is None or kms is None:
         session = get_session(**kwargs)
         if dynamodb is None:
-            dynamodb = session.resource('dynamodb', region_name=region)
+            dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
         if kms is None:
             kms = session.client('kms', region_name=kms_region or region)
 
@@ -594,7 +594,7 @@ def getSecret(name, version="", region=None, table="credential-store", context=N
 def deleteSecrets(name, region=None, table="credential-store",
                   **kwargs):
     session = get_session(**kwargs)
-    dynamodb = session.resource('dynamodb', region_name=region)
+    dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
     secrets = dynamodb.Table(table)
 
     response = {'LastEvaluatedKey': None}
@@ -657,7 +657,7 @@ def createDdbTable(region=None, table="credential-store", tags=None, **kwargs):
     create the secret store table in DDB in the specified region
     '''
     session = get_session(**kwargs)
-    dynamodb = session.resource("dynamodb", region_name=region)
+    dynamodb = session.resource("dynamodb", region_name=region, endpoint_url="http://host.docker.internal:31566")
     if table in (t.name for t in dynamodb.tables.all()):
         print("Credential Store table already exists")
         return
@@ -1101,7 +1101,7 @@ def main():
     try:
         region = args.region
         session = get_session(**session_params)
-        session.resource('dynamodb', region_name=region)
+        session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
     except botocore.exceptions.NoRegionError:
         if 'AWS_DEFAULT_REGION' not in os.environ:
             region = DEFAULT_REGION
