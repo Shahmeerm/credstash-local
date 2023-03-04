@@ -330,7 +330,7 @@ def putSecret(name, secret, version="", kms_key="alias/credstash",
         if dynamodb is None:
             dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
         if kms is None:
-            kms = session.client('kms', region_name=kms_region or region)
+            kms = session.client('kms', region_name=kms_region or region, endpoint_url="http://host.docker.internal:31566")
 
     key_service = KeyService(kms, kms_key, context)
     sealed = seal_aes_ctr_legacy(
@@ -380,7 +380,7 @@ def getAllSecrets(version="", region=None, table="credential-store",
     if session is None:
         session = get_session(**kwargs)
     dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
-    kms = session.client('kms', region_name=kms_region or region)
+    kms = session.client('kms', region_name=kms_region or region, endpoint_url="http://host.docker.internal:31566")
     secrets = listSecrets(region, table, session, **kwargs)
 
     # Only return the secrets that match the pattern in `credential`
@@ -563,7 +563,7 @@ def getSecret(name, version="", region=None, table="credential-store", context=N
         if dynamodb is None:
             dynamodb = session.resource('dynamodb', region_name=region, endpoint_url="http://host.docker.internal:31566")
         if kms is None:
-            kms = session.client('kms', region_name=kms_region or region)
+            kms = session.client('kms', region_name=kms_region or region, endpoint_url="http://host.docker.internal:31566")
 
     secrets = dynamodb.Table(table)
 
@@ -692,7 +692,7 @@ def createDdbTable(region=None, table="credential-store", tags=None, **kwargs):
     )
 
     print("Waiting for table to be created...")
-    client = session.client("dynamodb", region_name=region)
+    client = session.client("dynamodb", region_name=region, endpoint_url="http://host.docker.internal:31566")
 
     response = client.describe_table(TableName=table)
 
